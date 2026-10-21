@@ -2,8 +2,8 @@
 // CONFIGURAÇÕES DO CONTRATO E IPFS (PINATA)
 // ==========================================
 // TODO: Cole aqui os endereços após fazer o deploy no Remix!!
-const CAUCAO_ADDRESS = "0xa5bb61D7622F5027f195f4997eEC03C213D0370b";
-const MOCKBRL_ADDRESS = "0x425672C8CE1B83905e1AA69b0DF10A6B37F161fC";
+const CAUCAO_ADDRESS = "0xFBdC6715328d4C13c60a205d32B8E7EA15cC1715";
+const MOCKBRL_ADDRESS = "0xb7eE45069aAf1A064D8331c82C32cF26694d968A";
 
 const PINATA_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiIwYjE2M2M3MC1mZjk4LTQxYzktOGI1ZS05YmVmOWJhY2Y1YWIiLCJlbWFpbCI6Imxlby5jdXJ0YTU3QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaW5fcG9saWN5Ijp7InJlZ2lvbnMiOlt7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6IkZSQTEifSx7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6Ik5ZQzEifV0sInZlcnNpb24iOjF9LCJtZmFfZW5hYmxlZCI6ZmFsc2UsInN0YXR1cyI6IkFDVElWRSJ9LCJhdXRoZW50aWNhdGlvblR5cGUiOiJzY29wZWRLZXkiLCJzY29wZWRLZXlLZXkiOiJjYTYxZDJhNjdiNTU2NmU5MDNlMyIsInNjb3BlZEtleVNlY3JldCI6IjQ2YWRlMGM3OGY3ODE1ZGQzOGQxYTRhZjk2ODhmMDJlYTA2MWQxOTQyM2IxYTMyZGJmYTkzZjJiYjdhNmY4OTEiLCJleHAiOjE4MjI5MTgzNDZ9.7W89mtAbMDl0LkQV4faVZwgedHn7ggfllKCG7epABVM";
 
@@ -140,6 +140,25 @@ async function updateUI() {
         toggleCard('card-decursoPrazo', acoes.aceitarPorDecurso);
         toggleCard('card-emitirVeredito', acoes.emitirVeredito);
         toggleCard('card-sacar', acoes.sacar);
+
+        if (acoes.sacar) {
+            try {
+                let saldo = 0n;
+                const locadorAddr = await caucaoContract.locador();
+                const locatarioAddr = await caucaoContract.locatario();
+                if (userAddress.toLowerCase() === locadorAddr.toLowerCase()) {
+                    saldo = await caucaoContract.saldoLocador();
+                } else if (userAddress.toLowerCase() === locatarioAddr.toLowerCase()) {
+                    saldo = await caucaoContract.saldoLocatario();
+                }
+                const infoEl = document.getElementById('saldoSacarInfo');
+                if (infoEl) {
+                    infoEl.innerHTML = `Saldo disponível para resgate: <span class="text-emerald-900 font-bold">${ethers.formatEther(saldo)} mBRL</span>`;
+                }
+            } catch (err) {
+                console.warn("Erro ao ler saldo a sacar:", err);
+            }
+        }
 
         if (acoes.depositar) {
             await checkAllowance();
@@ -401,7 +420,8 @@ function setupButtons() {
             showMsg("Atenção: Você precisa anexar um arquivo PDF e preencher o valor dos danos!", "error");
             return;
         }
-        execTx(() => caucaoContract.enviarLaudo(currentLaudoCid, valorDanos), "Gravando Laudo com CID IPFS na Blockchain...");
+        const valorDanosWei = ethers.parseEther(valorDanos.toString());
+        execTx(() => caucaoContract.enviarLaudo(currentLaudoCid, valorDanosWei), "Gravando Laudo com CID IPFS na Blockchain...");
     });
 
     document.getElementById('btnAceitarLaudo').addEventListener('click', async () => {
@@ -422,7 +442,8 @@ function setupButtons() {
             showMsg("Atenção: Anexe a sentença em PDF e preencha o valor do Locador!", "error");
             return;
         }
-        execTx(() => caucaoContract.emitirVeredito(valorLocador, currentVereditoCid), "Emitindo Sentença com CID IPFS...");
+        const valorLocadorWei = ethers.parseEther(valorLocador.toString());
+        execTx(() => caucaoContract.emitirVeredito(valorLocadorWei, currentVereditoCid), "Emitindo Sentença com CID IPFS...");
     });
 
     document.getElementById('btnSacar').addEventListener('click', async () => {
