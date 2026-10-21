@@ -1,0 +1,645 @@
+[
+	{
+		"inputs": [
+			{
+				"internalType": "contract IERC20",
+				"name": "_token",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_locatario",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_agente",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_arbitro",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_valorCaucao",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_dataFim",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_prazoContestacao",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [],
+		"name": "EnderecoInvalido",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "EstadoInvalido",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "NaoAutorizado",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "PrazoEmAberto",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "PrazoNaoVencido",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "ReentrancyGuardReentrantCall",
+		"type": "error"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "token",
+				"type": "address"
+			}
+		],
+		"name": "SafeERC20FailedOperation",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "SemSaldo",
+		"type": "error"
+	},
+	{
+		"inputs": [],
+		"name": "ValorInvalido",
+		"type": "error"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "locatario",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "valor",
+				"type": "uint256"
+			}
+		],
+		"name": "CaucaoDepositada",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "locador",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "locatario",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "agente",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "arbitro",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "valorCaucao",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "dataFim",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "prazoContestacao",
+				"type": "uint256"
+			}
+		],
+		"name": "ContratoCriado",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "valorLocador",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "valorLocatario",
+				"type": "uint256"
+			}
+		],
+		"name": "Encerrado",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "locatario",
+				"type": "address"
+			}
+		],
+		"name": "LaudoAceito",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [],
+		"name": "LaudoAceitoPorDecurso",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "locatario",
+				"type": "address"
+			}
+		],
+		"name": "LaudoContestado",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "cidLaudo",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "valorDanos",
+				"type": "uint256"
+			}
+		],
+		"name": "LaudoEnviado",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "por",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "enum CaucaoLocaticia.Motivo",
+				"name": "motivo",
+				"type": "uint8"
+			}
+		],
+		"name": "LaudoSolicitado",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "quem",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "valor",
+				"type": "uint256"
+			}
+		],
+		"name": "Sacado",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "cidVeredito",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "valorLocador",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "valorLocatario",
+				"type": "uint256"
+			}
+		],
+		"name": "VereditoEmitido",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "aceitarLaudo",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "aceitarPorDecurso",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_conta",
+				"type": "address"
+			}
+		],
+		"name": "acoesDisponiveis",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "bool",
+						"name": "depositar",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "solicitarFimPrazo",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "solicitarInadimplencia",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "solicitarRescisao",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "enviarLaudo",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "aceitarLaudo",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "contestarLaudo",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "aceitarPorDecurso",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "emitirVeredito",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "sacar",
+						"type": "bool"
+					}
+				],
+				"internalType": "struct CaucaoLocaticia.Acoes",
+				"name": "acoes",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "agente",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "arbitro",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "cidLaudo",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "cidVeredito",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "contestarLaudo",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "dataFim",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "depositarCaucao",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_valorLocador",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_cidVeredito",
+				"type": "string"
+			}
+		],
+		"name": "emitirVeredito",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_cidLaudo",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_valorDanos",
+				"type": "uint256"
+			}
+		],
+		"name": "enviarLaudo",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "estado",
+		"outputs": [
+			{
+				"internalType": "enum CaucaoLocaticia.Estado",
+				"name": "",
+				"type": "uint8"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "laudoEmitidoEm",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "locador",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "locatario",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "prazoContestacao",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "sacar",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "saldoLocador",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "saldoLocatario",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "enum CaucaoLocaticia.Motivo",
+				"name": "_motivo",
+				"type": "uint8"
+			}
+		],
+		"name": "solicitarLaudo",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "token",
+		"outputs": [
+			{
+				"internalType": "contract IERC20",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "valorCaucao",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "valorDanosLaudo",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]

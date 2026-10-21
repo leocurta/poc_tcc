@@ -1,0 +1,20 @@
+1. Integração com Pix e stablecoins (On-ramp e Off-ramp)
+Uma das maiores barreiras que percebi é exigir que um inquilino comum tenha carteira de criptomoedas, compre tokens e pague Gas pra alugar um imóvel. Na vida real isso gera muita rejeição por pessoas leigas ou conservadoras. Uma evolução natural seria plugar um gateway bancário tradicional: a tela gera um QR Code Pix em reais, a pessoa paga pelo app do banco dela e um serviço por trás converte esse valor em stablecoin (ou DREX) e liquida o depósito no smart contract. No encerramento, o sistema faria o caminho inverso mandando um Pix de volta pro CPF do cliente, deixando o uso da blockchain 100% invisível.
+
+2. Carteiras invisíveis e login social (ERC-4337)
+Ninguém que vai alugar uma casa quer ter que anotar doze palavras de segurança (seed phrase) ou instalar extensão no navegador. Seria muito melhor usar conceitos de Abstração de Contas ou carteiras embarcadas pra pessoa acessar a plataforma simplesmente com sua conta Google, e-mail ou Gov.br. Além disso, contratos patrocinadores (Paymasters) poderiam custear as taxas de rede pela própria aplicação, entregando uma experiência idêntica à de um aplicativo bancário moderno.
+
+3. Rendimento da caução em DeFi ou títulos públicos
+Percebi uma exigência jurídica bem importante: o artigo 38 da Lei do Inquilinato diz que a caução em dinheiro precisa ficar rendendo juros equivalentes à caderneta de poupança durante o contrato. Hoje o dinheiro fica parado no cofre. Uma melhoria excelente seria conectar o cofre a protocolos seguros de DeFi ou a títulos públicos tokenizados (como Tesouro Selic em RWA), fazendo o dinheiro render durante a locação e devolvendo o valor corrigido pro inquilino no encerramento.
+
+4. Fábrica de contratos pra imobiliárias (Factory Pattern)
+Do jeito que o protótipo está hoje, cada caução precisa ser publicada manualmente no Remix ou via script, o que não escala se uma imobiliária gerenciar centenas de imóveis. O ideal seria criar um contrato central do tipo "Fábrica" (CaucaoFactory), onde a imobiliária clica em "Novo Contrato" e um novo smart contract de caução já é gerado, configurado e indexado automaticamente em um painel administrativo geral.
+
+5. Conselho de árbitros ou tribunal descentralizado (Kleros)
+Hoje a figura do Árbitro está centralizada na carteira de uma única pessoa. Se ela perder a chave privada, for parcial ou agir de má-fé, a decisão final fica comprometida. Uma evolução seria criar um conselho arbitral exigindo votação por maioria (Multi-sig), ou até conectar o contrato a tribunais descentralizados como o Kleros, onde jurados independentes e com incentivos econômicos analisam o laudo e as contestações pra dar o veredito.
+
+6. Automação do decurso de prazo por oráculos
+Atualmente, se o inquilino sumir e o prazo de contestação expirar, alguém ainda precisa ir lá na interface e clicar manualmente no botão de aceitar por decurso pra destravar os fundos. Uma melhoria seria integrar oráculos de automação descentralizada (como Chainlink Automation), pra que a própria rede detecte o fim do prazo e execute a função de aprovação sozinha assim que o cronômetro zerar, sem depender de ninguém clicar.
+
+7. Amarração formal com contratos assinados digitalmente
+Hoje o contrato de aluguel em PDF assinado pelas partes e o Smart Contract rodam de forma separada. Uma boa evolução seria fazer o contrato inteligente exigir a comprovação do hash do documento civil assinado eletronicamente (via ICP-Brasil, Clicksign ou DocuSign), garantindo que a caução na blockchain só seja ativada depois que ambas as partes tiverem assinado o contrato de locação formal no âmbito jurídico.
