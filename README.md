@@ -1,4 +1,4 @@
-# Caução Locatícia Descentralizada — Protótipo (TCC)
+# Caução Locatícia Descentralizada — Prova de Conceito (TCC)
 
 Este repositório contém a Prova de Conceito (PoC) desenvolvida como parte do **Trabalho de Conclusão de Curso (TCC)** sobre a descentralização da custódia de garantias locatícias utilizando **Contratos Inteligentes (*Smart Contracts*)**, **Armazenamento Descentralizado (IPFS)** e resolução de disputas via **Justice as a Service (JaaS)** em redes compatíveis com a Ethereum Virtual Machine (EVM / Layer 2 Base).
 
