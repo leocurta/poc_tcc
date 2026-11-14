@@ -1,3 +1,0 @@
-https://testnets.superbridge.app/ : mandar eth da layer1 pra layer2
-
-https://sepolia-faucet.pk910.de/ : faucet

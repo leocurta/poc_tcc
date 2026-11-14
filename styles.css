@@ -1,6 +1,6 @@
 :root {
-    --primary-color: #1e3a8a; /* Azul marinho escuro */
-    --secondary-color: #3b82f6; /* Azul brilhante */
+    --primary-color: #1e3a8a;
+    --secondary-color: #3b82f6;
     --bg-color: #f8fafc;
     --card-bg: #ffffff;
     --text-main: #1e293b;
@@ -27,7 +27,7 @@ body {
 header {
     background-color: var(--card-bg);
     padding: 1rem 2rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -69,7 +69,7 @@ header {
     background-color: var(--card-bg);
     border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
     border: 1px solid var(--border-color);
 }
 
@@ -121,6 +121,7 @@ input:focus {
     background-color: var(--primary-color);
     color: white;
 }
+
 .btn.primary:hover:not(:disabled) {
     background-color: var(--secondary-color);
 }
@@ -130,6 +131,7 @@ input:focus {
     color: var(--text-main);
     border: 1px solid var(--border-color);
 }
+
 .btn.secondary:hover:not(:disabled) {
     background-color: #e2e8f0;
 }
@@ -139,8 +141,9 @@ input:focus {
     color: white;
     width: 100%;
     text-align: center;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
+
 .btn.action-btn:hover:not(:disabled) {
     background-color: #2563eb;
     transform: translateY(-1px);
@@ -195,7 +198,7 @@ input:focus {
     color: white;
     padding: 1rem 1.5rem;
     border-radius: 8px;
-    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     transition: opacity 0.3s;
     font-weight: 500;
@@ -204,9 +207,11 @@ input:focus {
 .toast.error {
     background-color: var(--error);
 }
+
 .toast.success {
     background-color: var(--success);
 }
+
 .toast.info {
     background-color: var(--secondary-color);
 }

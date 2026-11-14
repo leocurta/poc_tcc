@@ -1,7 +1,6 @@
 /**
  * ==============================================================================
  * SCRIPT DE TESTES AUTOMATIZADOS NA LAYER 2 (BASE SEPOLIA)
- * TCC - Análise de Custos e Consumo de Gas em Ambiente Real L2
  * ==============================================================================
  * 
  * Este script executa os 3 cenários diretamente na rede real de testes Base Sepolia!
@@ -20,7 +19,7 @@
  */
 
 // ==============================================================================
-// ⚙️ CONFIGURAÇÃO DE CONTAS E REDE BASE SEPOLIA
+//  CONFIGURAÇÃO DE CONTAS E REDE BASE SEPOLIA
 // ==============================================================================
 
 const CONFIG = {
@@ -45,7 +44,7 @@ const CONFIG = {
 };
 
 // ==============================================================================
-// 🚀 EXECUÇÃO AUTOMATIZADA
+//  EXECUÇÃO AUTOMATIZADA
 // ==============================================================================
 
 (async () => {

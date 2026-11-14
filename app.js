@@ -2,31 +2,27 @@
 // CONFIGURAÇÕES DO CONTRATO E IPFS (PINATA)
 // ==========================================
 // TODO: Cole aqui os endereços após fazer o deploy no Remix!!
-const CAUCAO_ADDRESS = "0xFBdC6715328d4C13c60a205d32B8E7EA15cC1715";
-const MOCKBRL_ADDRESS = "0xb7eE45069aAf1A064D8331c82C32cF26694d968A";
+const CAUCAO_ADDRESS = "enreco_caucao";
+const MOCKBRL_ADDRESS = "endereco_mockbrl";
 
-const PINATA_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiIwYjE2M2M3MC1mZjk4LTQxYzktOGI1ZS05YmVmOWJhY2Y1YWIiLCJlbWFpbCI6Imxlby5jdXJ0YTU3QGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaW5fcG9saWN5Ijp7InJlZ2lvbnMiOlt7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6IkZSQTEifSx7ImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxLCJpZCI6Ik5ZQzEifV0sInZlcnNpb24iOjF9LCJtZmFfZW5hYmxlZCI6ZmFsc2UsInN0YXR1cyI6IkFDVElWRSJ9LCJhdXRoZW50aWNhdGlvblR5cGUiOiJzY29wZWRLZXkiLCJzY29wZWRLZXlLZXkiOiJjYTYxZDJhNjdiNTU2NmU5MDNlMyIsInNjb3BlZEtleVNlY3JldCI6IjQ2YWRlMGM3OGY3ODE1ZGQzOGQxYTRhZjk2ODhmMDJlYTA2MWQxOTQyM2IxYTMyZGJmYTkzZjJiYjdhNmY4OTEiLCJleHAiOjE4MjI5MTgzNDZ9.7W89mtAbMDl0LkQV4faVZwgedHn7ggfllKCG7epABVM";
+const PINATA_JWT = "chave_pinata_jwt";
 
-// ==========================================
-// VARIÁVEIS GLOBAIS
-// ==========================================
+
 let provider;
 let signer;
 let userAddress;
 let caucaoContract;
 let mockBrlContract;
 
-// CIDs do IPFS gerados no upload de arquivos
 let currentLaudoCid = "";
 let currentVereditoCid = "";
 
-// ABI Mínima do MockBRL para aprovação
 const mockBrlABI = [
     "function approve(address spender, uint256 amount) external returns (bool)",
     "function allowance(address owner, address spender) external view returns (uint256)"
 ];
 
-// Mapeamento dos Estados baseado no enum do Solidity
+
 const ESTADOS = [
     "CRIADO",
     "ATIVO",
@@ -36,9 +32,7 @@ const ESTADOS = [
     "ENCERRADO"
 ];
 
-// ==========================================
-// INICIALIZAÇÃO & METAMASK
-// ==========================================
+
 async function init() {
     if (typeof window.ethereum === 'undefined') {
         showMsg("MetaMask não detectada. Instale a extensão no seu navegador.", "error");
@@ -47,7 +41,6 @@ async function init() {
 
     provider = new ethers.BrowserProvider(window.ethereum);
 
-    //  Listener para reagir quando o usuário troca de conta na MetaMask
     window.ethereum.on('accountsChanged', handleAccountsChanged);
     window.ethereum.on('chainChanged', () => window.location.reload());
 
@@ -79,7 +72,6 @@ async function handleAccountsChanged(accounts) {
     userAddress = accounts[0];
     signer = await provider.getSigner();
 
-    // Mostra o endereço encurtado na UI
     document.getElementById('userAddress').innerText = userAddress.substring(0, 6) + "..." + userAddress.substring(38);
     document.getElementById('walletInfo').classList.remove('hidden');
     document.getElementById('btnConnect').classList.add('hidden');
@@ -109,9 +101,7 @@ async function loadContracts() {
     }
 }
 
-// ==========================================
-// LÓGICA DE INTERFACE E TIMELINE
-// ==========================================
+
 async function updateUI() {
     if (!caucaoContract) return;
 
@@ -120,15 +110,13 @@ async function updateUI() {
         const estadoRaw = await caucaoContract.estado();
         const estadoAtual = Number(estadoRaw);
 
-        // Atualiza a Linha do Tempo (Timeline)
         updateTimeline(estadoAtual);
 
         console.log(`Lendo permissões on-chain para a carteira: ${userAddress}`);
         const acoes = await caucaoContract.acoesDisponiveis(userAddress);
         console.log("Ações liberadas para você:", acoes);
 
-        // A MÁGICA: Controlando a visibilidade dos cards!
-        // Eles só vão aparecer se a conta logada for a certa, e se o estado do contrato permitir.
+
         toggleCard('card-depositar', acoes.depositar);
 
         const podeSolicitar = acoes.solicitarFimPrazo || acoes.solicitarInadimplencia || acoes.solicitarRescisao;
@@ -164,7 +152,7 @@ async function updateUI() {
             await checkAllowance();
         }
 
-        // Verifica e exibe o laudo SOMENTE se ele já tiver sido gravado no contrato
+
         await checkLaudoRegistrado(acoes);
 
     } catch (error) {
@@ -172,9 +160,7 @@ async function updateUI() {
     }
 }
 
-// ==========================================
-// VERIFICAÇÃO DO LAUDO ON-CHAIN (IPFS)
-// ==========================================
+
 async function checkLaudoRegistrado(acoes) {
     const banner = document.getElementById('bannerLaudoRegistrado');
     const boxLocatario = document.getElementById('boxLaudoLocatario');
@@ -186,18 +172,17 @@ async function checkLaudoRegistrado(acoes) {
     try {
         const cidOnChain = await caucaoContract.cidLaudo();
 
-        // Só exibe se o laudo de fato já foi inserido no contrato!
+
         if (cidOnChain && cidOnChain.trim() !== "") {
             const ipfsUrl = `https://gateway.pinata.cloud/ipfs/${cidOnChain}`;
 
-            // Banner visível para todos os envolvidos
+
             if (banner) {
                 banner.classList.remove('hidden');
                 if (bannerCid) bannerCid.innerText = cidOnChain;
                 if (btnBanner) btnBanner.href = ipfsUrl;
             }
 
-            // Bloco dentro do card do Locatário
             if (boxLocatario && (acoes.aceitarLaudo || acoes.contestarLaudo)) {
                 boxLocatario.classList.remove('hidden');
                 if (locatarioCid) locatarioCid.innerText = cidOnChain;
@@ -206,7 +191,7 @@ async function checkLaudoRegistrado(acoes) {
                 boxLocatario.classList.add('hidden');
             }
         } else {
-            // Laudo ainda não foi inserido: esconde tudo
+
             if (banner) banner.classList.add('hidden');
             if (boxLocatario) boxLocatario.classList.add('hidden');
         }
@@ -218,7 +203,6 @@ async function checkLaudoRegistrado(acoes) {
 }
 
 function updateTimeline(estado) {
-    // Cálculo do progresso da barra verde
     let progress = 0;
     if (estado === 1) progress = 25;
     if (estado === 2) progress = 50;
@@ -227,34 +211,28 @@ function updateTimeline(estado) {
 
     document.getElementById('timelineProgress').style.width = progress + '%';
 
-    // Atualização das bolinhas da linha do tempo
-    const steps = [0, 1, 2, 3, 5]; // 4 (Em Disputa) ocupa a mesma bolinha que o 3
+    const steps = [0, 1, 2, 3, 5];
 
     steps.forEach(step => {
         const icon = document.getElementById(`step-icon-${step}`);
         if (!icon) return;
 
-        // Limpa classes base
         icon.className = "w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold text-sm transition-all duration-500 z-10 relative";
 
-        // Se a bolinha ficou para trás
         if (estado > step || (estado === 4 && step === 3) || estado === 5) {
             icon.classList.add('border-emerald-500', 'bg-emerald-500', 'text-white');
             icon.innerHTML = "✓";
         }
-        // Se a bolinha é a fase ATUAL
         else if (estado === step) {
             icon.classList.add('border-emerald-500', 'bg-white', 'text-emerald-600', 'ring-4', 'ring-emerald-100');
             icon.innerHTML = "•";
         }
-        // Se a bolinha está no FUTURO
         else {
             icon.classList.add('border-slate-300', 'bg-white', 'text-slate-400');
             icon.innerHTML = step === 5 ? "5" : (step === 3 ? "4" : step + 1);
         }
     });
 
-    // Se estiver em disputa, altera o texto da etapa 4
     const step3Text = document.getElementById('step-text-3');
     if (estado === 4) {
         step3Text.innerText = "Em Disputa!";
@@ -306,11 +284,7 @@ async function checkAllowance() {
     }
 }
 
-// ==========================================
-// UPLOAD DE ARQUIVOS (PINATA / IPFS)
-// ==========================================
 
-// Gera CID demonstrativo no formato IPFS v0 (Qm...) se nenhum JWT da Pinata for configurado
 function generateMockCid(bytes) {
     const hashHex = ethers.keccak256(bytes).replace('0x', '');
     const b58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
@@ -322,7 +296,6 @@ function generateMockCid(bytes) {
     return mock;
 }
 
-// Upload para a rede IPFS via Pinata (com contingência inteligente)
 async function uploadArquivoIPFS(file, statusElement) {
     if (PINATA_JWT && PINATA_JWT.trim() !== "") {
         try {
@@ -350,14 +323,12 @@ async function uploadArquivoIPFS(file, statusElement) {
         }
     }
 
-    // Se PINATA_JWT não estiver preenchido, gera um CID IPFS válido localmente a partir dos bytes
     statusElement.innerText = "Processando arquivo e gerando CID IPFS...";
     const buffer = await file.arrayBuffer();
     return generateMockCid(new Uint8Array(buffer));
 }
 
 function setupFileUploads() {
-    // Upload do Agente (Laudo)
     document.getElementById('fileLaudo').addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -394,9 +365,6 @@ function setupFileUploads() {
     });
 }
 
-// ==========================================
-// FUNÇÕES DE TRANSAÇÃO (BOTÕES)
-// ==========================================
 function setupButtons() {
     document.getElementById('btnApprove').addEventListener('click', async () => {
         execTx(async () => {
@@ -451,9 +419,6 @@ function setupButtons() {
     });
 }
 
-// ==========================================
-// HELPER DE TRANSAÇÕES
-// ==========================================
 async function execTx(txFunction, loadingMsg) {
     showMsg(loadingMsg, "info");
     try {
@@ -473,7 +438,6 @@ async function execTx(txFunction, loadingMsg) {
     }
 }
 
-// Helpers Visuais de feedback
 function showMsg(text, type) {
     const box = document.getElementById('msgBox');
     box.innerText = text;
